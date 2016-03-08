@@ -1,0 +1,53 @@
+CREATE TABLE students
+(
+  id                  INT    NOT NULL,
+  gender              TEXT   NOT NULL,
+  ethnicity           TEXT   NOT NULL,
+  country             TEXT   NOT NULL,
+  birth_year          INT(4) NOT NULL,
+  martial_status      TEXT   NOT NULL,
+  served_mission      TEXT   DEFAULT '0',
+  subprogram_code     TEXT   NOT NULL,
+  classification      TEXT   NOT NULL,
+  track               TEXT   NOT NULL,
+  act_composite       INT(2) NULL,
+  act_english         INT(2) NULL,
+  act_math            INT(2) NULL,
+  act_reading         INT(2) NULL,
+  act_science         INT(2) NULL,
+  total_act           INT(2) NULL,
+  has_transfer_credit TEXT   DEFAULT '0',
+  transfer_credit     INT    NULL,
+  high_school_gpa     REAL   NOT NULL,
+  cumulative_gpa      REAL   NOT NULL,
+  major               TEXT   NOT NULL,
+  minor               TEXT   NULL,
+  emphasis            TEXT   NULL,
+  cluster             TEXT   NULL,
+  semester            TEXT   NOT NULL,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE grades
+(
+  id             INT    NOT NULL,
+  course_sec     TEXT   NOT NULL,
+  credits        INT(1) NOT NULL,
+  sec_subprogram TEXT   NOT NULL,
+  term           TEXT   NOT NULL,
+  grade          TEXT   NOT NULL,
+  student_id     INT    NOT NULL,
+  PRIMARY KEY(id),
+  FOREIGN KEY(student_id) REFERENCES students(id)
+);
+
+CREATE TABLE majors
+(
+  id         INT  NOT NULL,
+  major      TEXT NOT NULL,
+  course_sec TEXT NOT NULL,
+  student_id INT  NOT NULL,
+  semester   TEXT NOT NULL,
+  PRIMARY KEY(id),
+  FOREIGN KEY(student_id) REFERENCES students(id)
+);

@@ -1,0 +1,94 @@
+-- Insert statement for students
+INSERT INTO students
+(
+  id,
+  gender,
+  ethnicity,
+  country,
+  birth_year,
+  martial_status,
+  served_mission,
+  subprogram_code,
+  classification,
+  track,
+  act_composite ,
+  act_english,
+  act_math,
+  act_reading,
+  act_science,
+  total_act,
+  has_transfer_credit,
+  transfer_credit,
+  high_school_gpa,
+  cumulative_gpa,
+  major,
+  minor,
+  emphasis,
+  cluster,
+  semester
+)
+VALUES
+(
+,
+  '',
+  '',
+  '',
+,
+  '',
+  '',
+  '',
+  '',
+  '',
+,
+,
+,
+,
+,
+,
+  '',
+,
+,
+,
+  '',
+  '',
+  '',
+  '',
+  ''
+);
+
+-- Insert statement for grades
+INSERT INTO grades
+(
+  course_sec,
+  credits,
+  sec_subprogram,
+  term,
+  grade,
+  student_id
+)
+VALUES
+(
+  ,
+  '',
+  ,
+  '',
+  '',
+  '',
+
+);
+
+-- Insert statement for majors
+INSERT INTO majors
+(
+  major,
+  course_sec,
+  student_id,
+  semester
+)
+VALUES
+(
+  '',
+  '',
+  ,
+  ''
+);
