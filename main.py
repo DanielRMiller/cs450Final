@@ -19,77 +19,108 @@ import xlrd
 def insert_into_students(data, c, semester):
     # Start the for loop
     course_sec = ''
+    id = -1
     for row_index in range(1, data.nrows):
         # Grab the row
         row = data.row_values(row_index)
-        row = row[:-5]
 
         # Replace empty strings with None values
         #  this is equivalent to NULL
         row = [None if not c else c for c in row]
 
-        # Append the semester
-        row.append(semester)
-        print(row)
+        if row[0] is not None:
+            # Check if the id is different. If so change to the new id
+            if id == -1 or id != row[0]:
+                row = row[:-5]
+                id = row[0]
 
-        # Insert into the table
-        # c.execute('''INSERT INTO students
-        #             (
-        #               id,
-        #               gender,
-        #               ethnicity,
-        #               country,
-        #               birth_year,
-        #               martial_status,
-        #               served_mission,
-        #               subprogram_code,
-        #               classification,
-        #               track,
-        #               act_composite,
-        #               act_english,
-        #               act_math,
-        #               act_reading,
-        #               act_science,
-        #               total_act,
-        #               has_transfer_credit,
-        #               transfer_credit,
-        #               high_school_gpa,
-        #               cumulative_gpa,
-        #               major,
-        #               minor,
-        #               emphasis,
-        #               cluster,
-        #               semester
-        #             )
-        #             VALUES
-        #             (
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?,
-        #               ?
-        #             );''',
-        #             tuple(row))
+                # Append the semester
+                row.append(semester)
+
+                # Insert into the table
+                c.execute('''INSERT INTO students
+                            (
+                              id,
+                              gender,
+                              ethnicity,
+                              country,
+                              birth_year,
+                              martial_status,
+                              served_mission,
+                              subprogram_code,
+                              classification,
+                              track,
+                              act_composite,
+                              act_english,
+                              act_math,
+                              act_reading,
+                              act_science,
+                              total_act,
+                              has_transfer_credit,
+                              transfer_credit,
+                              high_school_gpa,
+                              cumulative_gpa,
+                              major,
+                              minor,
+                              emphasis,
+                              cluster,
+                              semester
+                            )
+                            VALUES
+                            (
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?
+                            );''',
+                            tuple(row))
+            else:
+                row = row[-5:]
+
+                # Append the id
+                row.append(id)
+
+                # Create a new insert statement
+                c.execute('''INSERT INTO grades
+                            (
+                              course_sec,
+                              credits,
+                              sec_subprogram,
+                              term,
+                              grade,
+                              student_id
+                            )
+                            VALUES
+                            (
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?,
+                              ?
+                            );''',
+                            tuple(row))
     return
 
 ###########################################
@@ -104,30 +135,35 @@ def insert_into_majors(data, c, semester):
         # Grab the row
         row = data.row_values(row_index)
 
+        # Replace empty strings with None values
+        #  this is equivalent to NULL
+        row = [None if not c else c for c in row]
+
         # Save the course value. This will let us know when we have change
         # course sections.
-        if not row[0]:
-            course_sec = row[0]
+        if row[1] is not None:
+            if row[0] is not None:
+                course_sec = row[0]
 
-        # Create the insert statment
-        c.execute('''INSERT INTO majors
-                    (
-                      major,
-                      course_sec,
-                      student_id,
-                      semester
-                    )
-                    VALUES
-                    (
-                      ?,
-                      ?,
-                      ?,
-                      ?
-                    );''',
-                    (course_sec,
-                    row[1],
-                    row[2],
-                    semester))
+            # Create the insert statment
+            c.execute('''INSERT INTO majors
+                        (
+                          major,
+                          course_sec,
+                          student_id,
+                          semester
+                        )
+                        VALUES
+                        (
+                          ?,
+                          ?,
+                          ?,
+                          ?
+                        );''',
+                        (course_sec,
+                        row[1],
+                        row[2],
+                        semester))
     return
 
 ###############################################
@@ -163,6 +199,7 @@ def main(argv):
         elif table_name == 'students':
             insert_into_students(first_sheet, c, semester)
 
+        conn.commit()
         conn.close()
     return
 
