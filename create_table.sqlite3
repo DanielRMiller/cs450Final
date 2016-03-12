@@ -23,8 +23,7 @@ CREATE TABLE students
   major               TEXT    NULL,
   minor               TEXT    NULL,
   emphasis            TEXT    NULL,
-  cluster             TEXT    NULL,
-  semester            TEXT    NOT NULL
+  cluster             TEXT    NULL
 );
 
 CREATE TABLE grades
@@ -45,6 +44,5 @@ CREATE TABLE majors
   major      TEXT    NOT NULL,
   course_sec TEXT    NOT NULL,
   student_id INT     NOT NULL,
-  semester   TEXT    NOT NULL,
   FOREIGN KEY(student_id) REFERENCES students(id)
 );

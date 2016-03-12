@@ -12,17 +12,36 @@ import sqlite3 as sql
 import xlrd
 
 ###########################################
+# check_student
+###########################################
+def check_student(id, c):
+    # Check the student if it already has been inserted
+    student = c.execute("SELECT id FROM students WHERE id = ?", (id,))
+
+    return student.fetchone() != None
+
+###########################################
+# check_grade
+###########################################
+def check_grade(c, id, course_sec, term):
+    grade = c.execute("SELECT student_id, course_sec, term FROM grades WHERE student_id = ? AND course_sec = ? AND term = ?", (id, course_sec, term))
+
+    return grade.fetchone() != None
+
+###########################################
 # insert_into_students
 #   This will insert new rows into the
 #       students table.
 ###########################################
-def insert_into_students(data, c, semester):
+def insert_into_students(data, c):
     # Start the for loop
     course_sec = ''
     id = -1
     for row_index in range(1, data.nrows):
         # Grab the row
         row = data.row_values(row_index)
+
+        duplicate = True
 
         # Replace empty strings with None values
         #  this is equivalent to NULL
@@ -31,76 +50,80 @@ def insert_into_students(data, c, semester):
         if row[0] is not None:
             # Check if the id is different. If so change to the new id
             if id == -1 or id != row[0]:
-                row = row[:-5]
-                id = row[0]
+                student = row[:-5]
+                id = student[0]
 
-                # Append the semester
-                row.append(semester)
+                duplicate = check_student(id, c)
 
-                # Insert into the table
-                c.execute('''INSERT INTO students
-                            (
-                              id,
-                              gender,
-                              ethnicity,
-                              country,
-                              birth_year,
-                              martial_status,
-                              served_mission,
-                              subprogram_code,
-                              classification,
-                              track,
-                              act_composite,
-                              act_english,
-                              act_math,
-                              act_reading,
-                              act_science,
-                              total_act,
-                              has_transfer_credit,
-                              transfer_credit,
-                              high_school_gpa,
-                              cumulative_gpa,
-                              major,
-                              minor,
-                              emphasis,
-                              cluster,
-                              semester
-                            )
-                            VALUES
-                            (
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?,
-                              ?
-                            );''',
-                            tuple(row))
-            else:
-                row = row[-5:]
+                if not duplicate:
+                    # Insert into the table
+                    c.execute('''INSERT INTO students
+                                (
+                                  id,
+                                  gender,
+                                  ethnicity,
+                                  country,
+                                  birth_year,
+                                  martial_status,
+                                  served_mission,
+                                  subprogram_code,
+                                  classification,
+                                  track,
+                                  act_composite,
+                                  act_english,
+                                  act_math,
+                                  act_reading,
+                                  act_science,
+                                  total_act,
+                                  has_transfer_credit,
+                                  transfer_credit,
+                                  high_school_gpa,
+                                  cumulative_gpa,
+                                  major,
+                                  minor,
+                                  emphasis,
+                                  cluster
+                                )
+                                VALUES
+                                (
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?,
+                                  ?
+                                );''',
+                                tuple(student))
+                else:
+                    print("Duplicate student id " + id)
 
-                # Append the id
-                row.append(id)
+            # Insert the grades
+            row = row[-5:]
 
+            # Append the id
+            row.append(id)
+
+            duplicate = check_grade(c, id, row[0], row[3])
+
+            if not duplicate:
                 # Create a new insert statement
                 c.execute('''INSERT INTO grades
                             (
@@ -121,6 +144,8 @@ def insert_into_students(data, c, semester):
                               ?
                             );''',
                             tuple(row))
+            else:
+                print("Duplicate grade for student id " + id)
     return
 
 ###########################################
@@ -173,11 +198,10 @@ def insert_into_majors(data, c, semester):
 def main(argv):
     # Grab the arguments for the file and the semester name
     if len(argv) < 2:
-        print("ERROR: You must pass these arguments <file> <table_name> <semester OPTIONAL>")
+        print("ERROR: You must pass these arguments <file>")
     else:
         file = argv[1]
-        table_name = argv[2]
-        semester = None
+        # table_name = argv[2]
 
         if len(argv) > 3:
             semester = argv[3]
@@ -194,10 +218,9 @@ def main(argv):
         first_sheet = book.sheet_by_index(0)
 
         # Call the function that will insert into the correct database
-        if table_name == 'majors':
-            insert_into_majors(first_sheet, c, semester)
-        elif table_name == 'students':
-            insert_into_students(first_sheet, c, semester)
+        # if table_name == 'majors':
+        #     insert_into_majors(first_sheet, c, semester)
+        insert_into_students(first_sheet, c)
 
         conn.commit()
         conn.close()
