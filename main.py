@@ -54,7 +54,7 @@ def insert_into_students(data, c):
                 id = student[0]
 
                 duplicate = check_student(id, c)
-
+                # print(row)
                 if not duplicate:
                     # Insert into the table
                     c.execute('''INSERT INTO students
@@ -123,7 +123,7 @@ def insert_into_students(data, c):
 
             duplicate = check_grade(c, id, row[0], row[3])
 
-            if not duplicate:
+            if not duplicate and row[2] is not None and row[3] is not None:
                 # Create a new insert statement
                 c.execute('''INSERT INTO grades
                             (
