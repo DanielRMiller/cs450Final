@@ -47,4 +47,4 @@ CREATE TABLE majors
   FOREIGN KEY(student_id) REFERENCES students(id)
 );
 
-ALTER TABLE grades ADD COLUMN grade_point INT NOT NULL;
+ALTER TABLE grades ADD COLUMN grade_point INT NULL;
