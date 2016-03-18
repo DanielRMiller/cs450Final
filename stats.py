@@ -114,8 +114,10 @@ def growthRate(c):
 
 	array = sorted(array)
 
-	x = [int(i[0]) for i in array]
-	y = [int(i[1]) for i in array]
+	new_array = [i for i in array if int(i[0]) >= 100]
+
+	x = [int(i[0]) for i in new_array]
+	y = [int(i[1]) for i in new_array]
 
 	plt.plot(x, y, 'ro', x, y, 'k')
 	plt.plot(x, np.poly1d(np.polyfit(x, y, 3))(x))
