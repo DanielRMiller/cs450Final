@@ -108,14 +108,14 @@ def main(argv):
 	# ##STATS
 	# When do students decide to be a CSEE Major
 		# PROBLEM: We do not have any about major by term
-	# studentDecison(c)
+	studentDecison(c)
 
 
 	# Performance CS vs EE vs CE vs SE vs ....
-	# comparisonMajor(c)
+	comparisonMajor(c)
 
 	# Performance for students taking 101 before 124
-	# comparison101To124(c)
+	comparison101To124(c)
 
 	# Performance Online vs F2F
 	comparisonOnlineVsF2F(c)
@@ -129,10 +129,11 @@ def main(argv):
 		# Question for Brother Burton
 	# Predict student's GPA for a specific class
 		# Neural Network
+		# Decision Tree
 
 	# Growth Rate
 		# Statistical
-	# Lift between elective classes
+	# Lift between elective classes, take the class based off grade,
 		# Association Rule Mining
 	# Cluster Students
 		# Clustering, kNN
