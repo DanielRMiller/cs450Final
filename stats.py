@@ -1,7 +1,9 @@
 import sys
 import sqlite3 as sql
 import math
+import matplotlib.pyplot as plt
 import numpy as np
+from operator import itemgetter
 
 def comparisonMajor(c):
 	student_grades = c.execute('''
@@ -91,7 +93,34 @@ def comparisonOnlineVsF2F(c):
 	print('DAY Mean and STDs', np.mean(day), np.std(online))
 	return
 
-def creditsForGraduation(c):
+###########################################
+# growthRate
+###########################################
+def growthRate(c):
+	students = c.execute('''
+		SELECT term, COUNT(term)
+		FROM grades
+		WHERE (term LIKE 'WI%' OR term LIKE 'FA%' OR term LIKE 'SP%')
+		AND (term NOT LIKE '%08' OR term NOT LIKE '%09')
+		GROUP BY term
+		''').fetchall()
+
+	# students = np.array(students)
+
+	terms = {'FA' : 0, 'WI' : 3, 'SP' : 6}
+	array = []
+	for s in students:
+		array.append([str(s[0][2:4]) + str(terms[s[0][0:2]]), s[1]])
+
+	array = sorted(array)
+
+	x = [int(i[0]) for i in array]
+	y = [int(i[1]) for i in array]
+
+	plt.plot(x, y, 'ro', x, y, 'k')
+	plt.plot(x, np.poly1d(np.polyfit(x, y, 3))(x))
+	plt.show()
+
 	return
 
 def main(argv):
@@ -108,21 +137,20 @@ def main(argv):
 	# ##STATS
 	# When do students decide to be a CSEE Major
 		# PROBLEM: We do not have any about major by term
-	studentDecison(c)
-
+	# studentDecison(c)
 
 	# Performance CS vs EE vs CE vs SE vs ....
-	comparisonMajor(c)
+	# comparisonMajor(c)
 
 	# Performance for students taking 101 before 124
-	comparison101To124(c)
+	# comparison101To124(c)
 
 	# Performance Online vs F2F
-	comparisonOnlineVsF2F(c)
+	# comparisonOnlineVsF2F(c)
 
-	# Overall problem of credits for graduation
-		# Credits before each class taken?
-	creditsForGraduation(c)
+	# Growth Rate
+		# Statistical
+	growthRate(c)
 
 	# ##ML
 	# Student will go over credit limit # NOT ENOUGH INFO
@@ -131,8 +159,6 @@ def main(argv):
 		# Neural Network
 		# Decision Tree
 
-	# Growth Rate
-		# Statistical
 	# Lift between elective classes, take the class based off grade,
 		# Association Rule Mining
 	# Cluster Students
