@@ -38,5 +38,7 @@ rownames(samp2) <- data[,1]
 
 data_scaled = scale(samp2)
 
-myClusters = kmeans(data_scaled, 5)
-clusplot(data_scaled, myClusters$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
+for (i in 1:25) {
+  myClusters = kmeans(data_scaled, i)
+  clusplot(data_scaled, myClusters$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
+}
