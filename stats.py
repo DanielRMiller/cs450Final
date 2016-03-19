@@ -48,9 +48,13 @@ def comparisonMajor(c):
 		major_stds.append( np.std(major_grades) )
 		major_means.append( np.mean(major_grades) )
 
-	print('Majors: ', majors)
-	print ('Major STDs: ', major_stds)
-	print ('Major Means: ', major_means)
+	print('Majors: ', np.array(majors))
+	# print ('Major STDs: ', major_stds)
+	# print ('Major Means: ', major_means)
+	x_pos = len(majors)
+
+	plt.barh(x_pos, major_means, align='center', alpha=0.4)
+
 	return
 
 def comparison101To124(c):
@@ -119,9 +123,9 @@ def growthRate(c):
 	x = [int(i[0]) for i in new_array]
 	y = [int(i[1]) for i in new_array]
 
-	plt.plot(x, y, 'ro', x, y, 'k')
-	plt.plot(x, np.poly1d(np.polyfit(x, y, 3))(x))
-	plt.show()
+	# plt.plot(x, y, 'ro', x, y, 'k')
+	# plt.plot(x, np.poly1d(np.polyfit(x, y, 3))(x))
+	# plt.show()
 
 	return
 
@@ -142,13 +146,13 @@ def main(argv):
 	# studentDecison(c)
 
 	# Performance CS vs EE vs CE vs SE vs ....
-	# comparisonMajor(c)
+	comparisonMajor(c)
 
 	# Performance for students taking 101 before 124
-	# comparison101To124(c)
+	comparison101To124(c)
 
 	# Performance Online vs F2F
-	# comparisonOnlineVsF2F(c)
+	comparisonOnlineVsF2F(c)
 
 	# Growth Rate
 		# Statistical
@@ -164,7 +168,7 @@ def main(argv):
 	# Lift between elective classes, take the class based off grade,
 		# Association Rule Mining
 	# Cluster Students
-		# Clustering, kNN
+		# Clustering
 
 	conn.commit()
 	conn.close()
