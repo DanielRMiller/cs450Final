@@ -40,5 +40,5 @@ data_scaled = scale(samp2)
 
 for (i in 1:25) {
   myClusters = kmeans(data_scaled, i)
-  clusplot(data_scaled, myClusters$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
+  clusplot(data_scaled, myClusters$cluster, color=TRUE, shade=TRUE, labels=1, lines=0)
 }
