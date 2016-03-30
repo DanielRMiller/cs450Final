@@ -4,6 +4,8 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 from operator import itemgetter
+from sklearn.tree import DecisionTreeClassifier
+import csv
 
 def comparisonMajor(c):
 	student_grades = c.execute('''
@@ -129,6 +131,46 @@ def growthRate(c):
 
 	return
 
+###########################################
+# growthRate
+###########################################
+def predictGPA(c, id, className):
+	students = c.execute('''
+		SELECT 	SUBSTR(g.course_sec || g.course_sec, 1, 8) AS course,
+				g.credits,
+				g.sec_subprogram,
+				g.term,
+				g.grade_point
+		FROM students as s
+		LEFT JOIN grades as g
+		ON s.id = g.student_id
+		WHERE s.id IS NOT ? AND g.grade_point IS NOT ?
+		''', (id, None)).fetchall()
+	student = c.execute('''
+		SELECT 	SUBSTR(g.course_sec || g.course_sec, 1, 8) AS course,
+				g.credits,
+				g.sec_subprogram,
+				g.term,
+				g.grade_point
+		FROM students as s
+		LEFT JOIN grades as g
+		ON s.id = g.student_id
+		WHERE s.id = ? AND g.grade_point IS NOT ?
+		''', (id, None)).fetchall()
+	trainingTargets = [row[-1] for row in students]
+	trainingData = [row[:-1] for row in students]
+	print (trainingTargets)
+	print (trainingData)
+	dtc = DecisionTreeClassifier()
+	dtc.fit(trainingData, trainingTargets)
+
+	with open('grades.csv', 'wb') as csvfile:
+		spamwriter = csv.writer(csvfile, delimiter=' ',
+								quotechar='|', quoting=csv.QUOTE_MINIMAL)
+		spamwriter.writerow(['Spam'] * 5 + ['Baked Beans'])
+		spamwriter.writerow(['Spam', 'Lovely Spam', 'Wonderful Spam'])
+		return
+
 def main(argv):
 	if len(argv) < 1:
 		print ("Please enter parameters as: <program_name>")
@@ -146,24 +188,25 @@ def main(argv):
 	# studentDecison(c)
 
 	# Performance CS vs EE vs CE vs SE vs ....
-	comparisonMajor(c)
+	# comparisonMajor(c)
 
 	# Performance for students taking 101 before 124
-	comparison101To124(c)
+	# comparison101To124(c)
 
 	# Performance Online vs F2F
-	comparisonOnlineVsF2F(c)
+	# comparisonOnlineVsF2F(c)
 
 	# Growth Rate
 		# Statistical
-	growthRate(c)
+	# growthRate(c)
 
+	id = 1717131616161010
 	# ##ML
 	# Student will go over credit limit # NOT ENOUGH INFO
 		# Question for Brother Burton
 	# Predict student's GPA for a specific class
-		# Neural Network
 		# Decision Tree
+	predictGPA(c, id, 'CS   450')
 
 	# Lift between elective classes, take the class based off grade,
 		# Association Rule Mining
