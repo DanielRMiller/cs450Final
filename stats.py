@@ -6,6 +6,7 @@ import numpy as np
 from operator import itemgetter
 from sklearn.tree import DecisionTreeClassifier
 import csv
+from collections import defaultdict
 
 def comparisonMajor(c):
 	student_grades = c.execute('''
@@ -135,41 +136,51 @@ def growthRate(c):
 # growthRate
 ###########################################
 def predictGPA(c, id, className):
-	students = c.execute('''
-		SELECT 	SUBSTR(g.course_sec || g.course_sec, 1, 8) AS course,
-				g.credits,
-				g.sec_subprogram,
-				g.term,
-				g.grade_point
-		FROM students as s
-		LEFT JOIN grades as g
-		ON s.id = g.student_id
-		WHERE s.id IS NOT ? AND g.grade_point IS NOT ?
-		''', (id, None)).fetchall()
-	student = c.execute('''
-		SELECT 	SUBSTR(g.course_sec || g.course_sec, 1, 8) AS course,
-				g.credits,
-				g.sec_subprogram,
-				g.term,
-				g.grade_point
-		FROM students as s
-		LEFT JOIN grades as g
-		ON s.id = g.student_id
-		WHERE s.id = ? AND g.grade_point IS NOT ?
-		''', (id, None)).fetchall()
-	trainingTargets = [row[-1] for row in students]
-	trainingData = [row[:-1] for row in students]
-	print (trainingTargets)
-	print (trainingData)
-	dtc = DecisionTreeClassifier()
-	dtc.fit(trainingData, trainingTargets)
+	courses = set(c.execute('''
+		SELECT 	SUBSTR(g.course_sec || g.course_sec, 1, 8) AS course
+		FROM grades AS g
+		''').fetchall())
 
-	with open('grades.csv', 'wb') as csvfile:
-		spamwriter = csv.writer(csvfile, delimiter=' ',
-								quotechar='|', quoting=csv.QUOTE_MINIMAL)
-		spamwriter.writerow(['Spam'] * 5 + ['Baked Beans'])
-		spamwriter.writerow(['Spam', 'Lovely Spam', 'Wonderful Spam'])
-		return
+	students = c.execute('''
+		SELECT id
+		FROM students
+		''').fetchall()
+
+	grades = c.execute('''
+		SELECT student_id,
+			   SUBSTR(course_sec || course_sec, 1, 8) AS course,
+			   grade
+		FROM grades
+		WHERE grade IS NOT NULL AND grade != 'IP'
+		''').fetchall()
+
+	d = defaultdict(list)
+	for grade in grades:
+		d[grade[0]].append(grade[1:])
+
+	# Create columns
+	csv_data = []
+	csv_data.append(['id'])
+
+	for course in courses:
+		csv_data[0].append(course[0])
+
+	size = len(csv_data[0])
+	for student in d:
+		row = ['?'] * size
+		row[0] = student
+
+		for course in d[student]:
+			index = csv_data[0].index(course[0])
+			row[index] = course[1]
+
+		csv_data.append(row)
+
+	# Write to csv file
+	with open('grades.csv', 'w', newline='') as fp:
+	    a = csv.writer(fp, delimiter=',')
+	    a.writerows(csv_data)
+	return
 
 def main(argv):
 	if len(argv) < 1:
